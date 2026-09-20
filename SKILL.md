@@ -57,23 +57,33 @@ identifiers, file paths and CLI terms in their original form.
 
 1. **拿到 stars 列表。** Prefer `https://api.github.com/users/<name>/starred?per_page=100`
    (public, no auth; paginate). `gh` is often absent — do not require it.
-   If the API is unreachable, ask the user for a manual export. For a single
-   repo request, skip the list and treat that repo as the whole A-tier.
+   403/429 = 限流：稍候重试一次，仍失败请用户手动导出。若列表为空（常见于
+   组织账号），告知用户并提议改讲其公开仓库（`/users/<name>/repos`）或用户
+   点名的仓库——不要凭空继续。For a single repo request, skip the list and
+   treat that repo as the whole A-tier.
 2. **归类 + 提出分级方案。** Categorize the list, then propose an A/B split
    (heuristics in [references/playbook.md](references/playbook.md) §分级):
-   A 级 = deep dives with diagrams; B 级 = one-pagers. Show the split as a
-   table, get confirmation.
-3. **分批执行 A 级。** Per repo: `git clone --depth 1` into the temp dir →
-   analyze the real code (dispatch a sub-agent for big repos; the prompt must
-   demand `file:line` anchors and explicit "uncertain" flags) → write the
-   README from [assets/templates/readme-template.md](assets/templates/readme-template.md)
+   A 级 = deep dives with diagrams; B 级 = one-pagers. 清单数十条以内逐行列出；
+   数百条则按类目汇总（A 级候选逐个列出，B 级按类目给数量与代表）。
+   Get confirmation.
+3. **建总索引。** 开工前创建 `<输出目录>/README.md`：全量篇目 + 状态列
+   （⬜待做/🖊️写作中/✅完成/❌失效）。之后每完成一篇立刻翻状态。
+4. **分批执行 A 级。** 产物布局：每个仓库一个子目录 `<输出目录>/<repo-名>/`，
+   内含 `README.md` + 三图 HTML + `_*.png` 自检图。Per repo:
+   `git clone --depth 1` into the temp dir → analyze → write the README from
+   [assets/templates/readme-template.md](assets/templates/readme-template.md)
    → draw the three diagrams per [references/diagram-spec.md](references/diagram-spec.md)
-   → render PNGs and self-inspect → hand the batch to visual QA when available.
-   Re-dispatch any sub-agent that dies of rate limits after the others finish.
-4. **B 级批量产出。** One page per repo from its README (fetched via
-   raw.githubusercontent.com / the GitHub API — no clone). See
+   → render PNGs and self-inspect → hand the batch to visual QA when a
+   sub-agent runtime is available（无子代理能力则严格自检并在交付时注明）。
+   仓库超过约 200 个文件或为 monorepo 时派子代理分析（prompt 必须自带模板
+   路径、输出目录、`file:line` 锚点要求和"不确定就明说"）；小仓库主上下文
+   直接读。Re-dispatch any sub-agent that dies of rate limits after the
+   others finish. 同一页修复重检 ≤2 轮，仍不达标则标注已知问题交付。
+5. **B 级批量产出。** One page per repo from its README (fetched via
+   raw.githubusercontent.com / the GitHub API — no clone), saved as
+   `B级轻量/<owner>__<repo>.md`. See
    [references/playbook.md](references/playbook.md) §B级 for the template.
-5. **收尾。** Update the index status markers, delete the temp clones, report
+6. **收尾。** Update the index status markers, delete the temp clones, report
    totals and any repos you could not verify.
 
 ## 模式 B · 本机技能盘点 / Installed-skills mode
@@ -97,8 +107,9 @@ The three diagrams are drawn with the bundled diagram-design skill (vendored
 under `third-party/diagram-design/`, MIT).
 
 1. **探测已装副本**（质量优先）：check `~/.codex/skills/diagram-design/SKILL.md`,
-   `~/.agents/skills/diagram-design/SKILL.md`, `~/.skills-manager/skills/…`,
-   and the project's skill roots. If found, read THAT copy — it may be newer.
+   `~/.agents/skills/diagram-design/SKILL.md`, `~/.skills-manager/skills/diagram-design/SKILL.md`,
+   plus the project's own skill roots (`<cwd>/.zcode/skills/`, `<cwd>/.agents/skills/`).
+   If found, read THAT copy — it may be newer.
 2. **缺失则从 vendor 安装**：copy `third-party/diagram-design/` to
    `~/.agents/skills/diagram-design/`, tell the user what you installed and
    from where, then read it from the installed path.
@@ -118,12 +129,11 @@ under `third-party/diagram-design/`, MIT).
   `npx playwright screenshot --channel msedge --viewport-size=1280,900 --full-page "<url>" out.png`.
   Only fall back to a full `npx playwright install chromium` if msedge is
   unavailable.
-- Self-inspect every PNG (Read it) and fix label collisions before calling a
-  diagram done. When a read-only judge sub-agent is available, hand it the
-  PNGs with the rubric from diagram-spec §验收; re-judge only the pages you
-  changed.
-- 环境实在不具备时：state plainly that diagrams were skipped and why, and
-  ship Mermaid-in-Markdown as the documented fallback. Never silently.
+- 有子代理 runtime 时：把 PNG 交给一个只读评审代理，rubric 见 diagram-spec
+  §验收；**只复检改过的页**，并在复检 prompt 里写明每处修复。
+- 完整降级链（有序，走到哪级都在交付里注明）：diagram-design 探测/安装 →
+  msedge 截图 → chromium 安装 → 全部失败才 Mermaid-in-Markdown 兜底。Never
+  silently skip diagrams.
 
 ## 参考文件 / When to read what
 
