@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<!-- 运行流程图骨架：Flowchart 纵向主链。形状承载语义（oval 起点 / rect 步骤 /
+     diamond 判定≤3出口且每条出口有标签 / 小实心点汇合）。规则见 references/diagram-spec.md -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title><项目名> · 运行流程图</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#f5f5f5;font-family:'Geist','Noto Sans SC',sans-serif;color:#2d3142;}
+  main{max-width:1220px;margin:0 auto;padding:40px 28px 48px;}
+  .eyebrow{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#7a8399;margin:0 0 10px;}
+  h1{font-family:'Instrument Serif','Noto Sans SC',serif;font-weight:400;font-size:30px;margin:0 0 6px;}
+  .subtitle{font-size:14px;color:#4f5d75;margin:0 0 28px;}
+  figure{margin:0;}
+  figcaption{font-family:'Geist Mono',monospace;font-size:10px;color:#7a8399;margin-top:14px;}
+  footer{margin-top:36px;padding-top:12px;border-top:1px solid rgba(45,49,66,.10);font-family:'Geist Mono',monospace;font-size:10px;color:#7a8399;letter-spacing:.06em;}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <p class="eyebrow"><项目名> · Runtime Flow</p>
+  <h1>运行流程图</h1>
+  <p class="subtitle"><一句话：从什么到什么的核心链路></p>
+</header>
+<figure>
+<svg viewBox="0 0 1180 1090" role="img" aria-labelledby="mf-title mf-desc">
+<title id="mf-title"><项目名> 运行流程图</title>
+<desc id="mf-desc"><一句话：主链从哪开始、经过哪些关键步骤、在哪里分支与汇合、终点是什么。></desc>
+<defs>
+<marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+<marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+</defs>
+<rect width="100%" height="100%" fill="#f5f5f5"/>
+
+<!-- 主链居中 cx=480（盒 x=280 w=400）；分支向右。先画全部箭头再画节点 -->
+<!-- 1 起点：pill -->
+<rect x="330" y="141" width="300" height="68" rx="34" fill="#f5f5f5"/>
+<rect x="330" y="141" width="300" height="68" rx="34" fill="rgba(45,49,66,0.05)" stroke="#7a8399" stroke-width="1"/>
+<text x="480" y="172" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle"><起点动作></text>
+<text x="480" y="192" fill="#4f5d75" font-size="9" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle"><入口举例（UI/命令/事件）></text>
+<line x1="480" y1="209" x2="480" y2="241" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+<!-- 2 步骤 rect：名称 + 2 行细节 + file:line -->
+<rect x="280" y="241" width="400" height="92" rx="6" fill="#f5f5f5"/>
+<rect x="280" y="241" width="400" height="92" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<text x="480" y="272" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist','Noto Sans SC',sans-serif" text-anchor="middle"><步骤名（真实函数名）></text>
+<text x="480" y="294" fill="#4f5d75" font-size="9" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle"><关键动作 · 防竞态/缓存等细节></text>
+<text x="480" y="310" fill="#4f5d75" font-size="9" font-family="'Geist Mono','Noto Sans SC',monospace" text-anchor="middle"><file:line></text>
+
+<!-- 判定 diamond（≤3 出口；Yes 右 No 下；每条出口必须带标签）：
+<polygon points="480,500 620,555 480,610 340,555" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+     分支 rect 放右侧（如 x=740 w=290）；汇合用 r=4 实心点；虚线回环 = 重试/迭代 -->
+<!-- 珊瑚：只给"进入主循环/最关键判定"的那一个节点 + 它的入边 -->
+
+<!-- 图例建议项：焦点环节 / 处理步骤 / 判定分支 / 汇合点 -->
+<line x1="30" y1="1044" x2="1150" y2="1044" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+<text x="30" y="1068" fill="#4f5d75" font-size="8" font-family="'Geist Mono',monospace" letter-spacing="0.14em">LEGEND</text>
+<!-- <TODO> -->
+</svg>
+<figcaption><一句话注明分支取舍：哪些路径合并画了、锚点文件的相对位置></figcaption>
+</figure>
+<footer><PROJECT> RUNTIME FLOW · GENERATED WITH DIAGRAM-DESIGN · <日期></footer>
+</main>
+</body>
+</html>
