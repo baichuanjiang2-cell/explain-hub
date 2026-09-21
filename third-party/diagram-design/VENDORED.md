@@ -1,28 +1,40 @@
 # Vendored: diagram-design
 
-本目录是 **diagram-design** 技能的完整 vendored 副本（v2.6，MIT 许可），
-作为 explain-hub 的图表绘制引擎。
+This directory is a complete vendored copy of the **diagram-design** skill
+(v2.6, MIT-licensed), used as explain-hub's diagram engine.
 
-## 来源
+## Upstream
 
-本副本取自 skills 市场安装的本地副本（安装时未携带 git 元数据，无法确定
-上游 commit）。未做任何修改。查找上游更新：搜索 "diagram-design agent
-skill editorial SVG" 或在技能市场检索 diagram-design。
+- Repository: <https://github.com/cathrynlavery/diagram-design>
+- Author & copyright holder: Cathryn Lavery
+- License: MIT — see [LICENSE](LICENSE) in this directory (verbatim copy of
+  the upstream license file)
 
-## 为什么 vendor
+Provenance note: this copy was originally taken from a local marketplace
+install (which carried no git metadata), so the exact upstream commit it
+snapshots is unknown. The version stated in its `SKILL.md` frontmatter is
+`2.6`, which matched upstream `main` at the time of vendoring. No
+modifications were made. To pick up upstream fixes, re-vendor from the
+repository linked above.
 
-explain-hub 的深度讲解强制要求三张 diagram-design 风格图表（功能全景 /
-模块架构 / 运行流程）。打包副本保证：
+## Why vendored
 
-1. 离线/受限网络环境下也能安装（运行时从本目录复制到用户技能目录）；
-2. 图表质量基线一致（diagram-design 的连线规则与复杂度预算是验收标准）。
+explain-hub's deep dives require three diagram-design-style diagrams
+(panorama / module architecture / runtime flow). Bundling a copy guarantees:
 
-## 更新
+1. Installation works offline or behind restricted networks (at runtime,
+   explain-hub copies this directory into the user's skills directory).
+2. The diagram quality bar stays consistent — diagram-design's connector
+   rules and complexity budget *are* explain-hub's acceptance criteria.
 
- prefer 使用你机器上已安装的更新版本——explain-hub 运行时会优先探测
-本地已装的 diagram-design，找到即用那份；本目录只是兜底安装源。
+## Updates
 
-## 许可
+explain-hub prefers a newer copy already installed on your machine: at
+runtime it probes the standard skill roots first and uses whatever it finds.
+This directory is only the fallback install source.
 
-diagram-design 以 MIT 许可发布，版权归其原作者所有。本 vendored 副本
-遵循同一许可；explain-hub 对该目录的修改（如有）同样以 MIT 开源。
+## License
+
+diagram-design is released under the MIT License, copyright its original
+author (Cathryn Lavery). This vendored copy ships under that same license;
+any modifications explain-hub makes to this directory are likewise MIT.
