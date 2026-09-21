@@ -8,22 +8,21 @@
 English | [简体中文](README.zh-CN.md)
 
 ```text
-Your GitHub stars · N repos
-├── A-tier N → deep dives: README (three angles + file:line anchors)
+Your GitHub stars, tiered automatically
+├── key repos → deep dives: README (three angles + file:line anchors)
 │               + panorama, architecture and runtime-flow diagrams
-└── B-tier N → one-page notes
+└── the long tail → one-page notes
 
-Installed skills on this machine · N (deduplicated through the symlink farm)
+Your installed agent skills, inventoried
 ├── standalone → six-section explainer (positioning / when / trigger / example / pairings / caveats)
 ├── families   → merged into one overview (member roles + cooperation chain)
 └── broken     → root cause + reinstall guide
 ```
 
 explain-hub is a reusable [agent skill](https://github.com/topics/agent-skills)
-distilled from one real batch-explainer run: batch explainers
-explainers and diagrams, all accepted by independent visual review. Drop it
-into Claude Code, Codex, ZCode or any Agent-Skills-compatible host, then just
-talk to your agent.
+distilled from real batch-explainer runs, with every diagram passing an
+independent visual review. Drop it into Claude Code, Codex, ZCode or any
+Agent-Skills-compatible host, then just talk to your agent.
 
 ## Example output
 
@@ -108,11 +107,12 @@ explain-hub/
 └── third-party/diagram-design/  # the diagram engine, vendored (MIT)
 ```
 
-## Proven on
+## Field-tested
 
-One real run: many repos and diagrams — all passed independent
-visual acceptance. This repo's
-`references/` are the lessons that run left behind.
+Every rule in `references/` was earned in real batch runs: API fallback
+chains, facade-repo detection, rate-limit recovery, doc-vs-code drift checks,
+and the visual-acceptance loop behind the three diagrams. A full worked
+example ships under [`examples/`](examples/).
 
 ## Contributing
 
