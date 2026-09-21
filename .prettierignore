@@ -1,0 +1,5 @@
+third-party/
+examples/
+.mimosa/
+_repos/
+node_modules/

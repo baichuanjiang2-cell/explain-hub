@@ -1,0 +1,13 @@
+{
+  "//": "lint our docs only; vendored + generated trees are excluded",
+  "config": {
+    "default": true,
+    "MD013": false,
+    "MD033": false,
+    "MD036": false,
+    "MD041": false,
+    "MD024": { "siblings_only": true },
+  },
+  "globs": ["**/*.md"],
+  "ignores": ["third-party/**", "examples/**", ".mimosa/**", "node_modules/**"],
+}

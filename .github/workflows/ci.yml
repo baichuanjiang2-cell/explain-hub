@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    name: Lint & format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Markdown lint
+        run: npx --yes markdownlint-cli2
+
+      - name: Prettier check
+        run: npx --yes prettier@3 --check .
+
+      - name: Template HTML sanity
+        run: |
+          for f in assets/templates/*-template.html; do
+            grep -qi "<!doctype" "$f" || { echo "missing doctype: $f"; exit 1; }
+            grep -q "</html>" "$f" || { echo "unclosed html: $f"; exit 1; }
+          done
