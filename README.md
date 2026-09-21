@@ -1,81 +1,127 @@
 # explain-hub
 
-**把 GitHub 收藏（stars）和本机已装的 agent 技能，变成一套带架构图的中文深度讲解。**
-Turn your GitHub stars — or the agent skills installed on your machine — into tiered, diagram-backed explainers.
+**Turn your GitHub stars — or the agent skills installed on your machine — into tiered, diagram-backed explainers.**
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/baichuanjiang2-cell/explain-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/baichuanjiang2-cell/explain-hub/actions/workflows/ci.yml)
+
+English | [简体中文](README.zh-CN.md)
+
+```text
+Your GitHub stars · N repos
+├── A-tier N → deep dives: README (three angles + file:line anchors)
+│               + panorama, architecture and runtime-flow diagrams
+└── B-tier N → one-page notes
+
+Installed skills on this machine · N (deduplicated through the symlink farm)
+├── standalone → six-section explainer (positioning / when / trigger / example / pairings / caveats)
+├── families   → merged into one overview (member roles + cooperation chain)
+└── broken     → root cause + reinstall guide
 ```
-你的 GitHub 收藏 · N 个仓库
-├── A 级 N 个 → 深度讲解：README（三角度 + file:line 锚点）
-│                + 功能全景图 + 模块架构图 + 运行流程图（diagram-design 出品）
-└── B 级 N 个 → 一页纸轻量讲解
 
-本机已装技能 · N 个（软链接去重后）
-├── 独立技能 → 六段式讲解（定位/何时用/怎么触发/示例/配合/注意）
-├── 成系列   → 合并成一篇总览（成员分工 + 配合链）
-└── 失效的   → 记录根因 + 重装指引
-```
+explain-hub is a reusable [agent skill](https://github.com/topics/agent-skills)
+distilled from one real batch-explainer run: batch explainers
+explainers and diagrams, all accepted by independent visual review. Drop it
+into Claude Code, Codex, ZCode or any Agent-Skills-compatible host, then just
+talk to your agent.
 
-这是把一次真实的批量讲解工程（多批讲解与图表）沉淀成的可复用 agent skill。
+## Example output
 
-## 它做什么 / What it does
+A real run on [`tj/commander.js`](https://github.com/tj/commander.js) — the
+full deep dive lives in [`examples/tj__commander.js/`](examples/tj__commander.js/)
+(README with `file:line` anchors + three diagram HTML files + rendered PNGs):
 
-| 模式 | 输入 | 产出 |
-|---|---|---|
-| **A · Stars 讲解** | GitHub 用户名 | `stars讲解/`：A 级项目各得一个文件夹（深度 README + 3 张交互式 SVG 图表 HTML + PNG 预览），B 级一页纸 |
-| **B · 技能盘点** | 本机（自动扫描） | `skills讲解/`：按系列合并的技能讲解 + 总索引 + 失效技能记录 |
+<p align="center">
+  <img src="docs/images/panorama.png" alt="Panorama diagram example — capability zones and modules of commander.js" width="720">
+</p>
+<p align="center"><em>Functional panorama (one of the three diagrams every A-tier explainer ships).</em></p>
 
-内置的硬核机制（全部来自实战踩坑）：
+## What it does
 
-- **图表强制 + 视觉验收**：三张图必须通过连线规则（直角肘线、标签蒙版留隙、虚线跨越桥）与复杂度预算（≤9 节点/≤3 分区/≤2 强调色），渲染后逐张截图自检，有视觉验收代理时再过一遍独立评审；
-- **分级讲解**：A 级全量深挖、B 级一页纸兜底，分级启发式可调；
-- **事实纪律**：每条结论带 `file:line` 锚点；"门面仓库"识别（星数高但 main 是空脚手架）、文档与代码漂移核查、未核实项如实标注；
-- **环境降级链**：`gh` 缺失用公开 API、克隆失败用 raw 文件分析、Chromium 下载失败用 msedge 通道截图、子代理限流后重派。
+| Mode                     | Input                       | Output                                                                                                                                        |
+| ------------------------ | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **A · Stars explainer**  | a GitHub username           | `stars-explained/`: one folder per A-tier repo (deep README + 3 interactive SVG diagram HTML files + PNG previews), one-pagers for the B-tier |
+| **B · Skills inventory** | this machine (auto-scanned) | `skills-explained/`: family-merged skill explainers + a master index + a broken-skills report                                                 |
 
-## 安装 / Install
+The engine's hard rules — all earned the hard way during real runs:
 
-把本目录复制到任意技能发现路径之一：
+- **Mandatory diagrams + visual acceptance.** The three diagrams must pass
+  connector rules (orthogonal elbows, masked labels with gaps, dashed-line
+  crossing bridges) and a complexity budget (≤9 nodes / ≤3 zones / ≤2 accent
+  elements), get screenshot-rendered for self-check, then go through an
+  independent visual review agent when a sub-agent runtime is available.
+- **Tiered treatment.** A-tier gets the full deep dive; B-tier gets a
+  one-pager as the floor. Tiering heuristics are tunable.
+- **Fact discipline.** Every claim carries a `file:line` anchor; facade repos
+  (high stars, empty scaffold on `main`) are detected and routed to the real
+  code; doc-vs-code drift is checked and reported; unverifiable items are
+  labeled as such.
+- **Fallback chains for everything.** no `gh` → public API; clone fails →
+  raw-file analysis; Chromium download fails → the msedge channel for
+  screenshots; sub-agents rate-limited → re-dispatch after the rest finish.
+
+## Install
+
+Copy this directory into any skill-discovery path:
 
 ```bash
-# 用户级（所有项目可用）
+# user-level (available in every project)
 cp -r explain-hub ~/.agents/skills/explain-hub
 
-# 或项目级（仅当前仓库可用）
+# or project-level (this repo only)
 cp -r explain-hub .agents/skills/explain-hub
 ```
 
-要求：能运行 agent（Claude Code / Codex / ZCode 等），`npx playwright` 与系统 Edge（用于图表截图验收）。图表引擎 [diagram-design](third-party/diagram-design/VENDORED.md) 已打包在本仓库内，技能运行时会自动探测/安装。
+Requirements: an agent runtime (Claude Code / Codex / ZCode / …),
+`npx playwright` and the system Edge browser (for diagram screenshot QA). The
+diagram engine [diagram-design](third-party/diagram-design/VENDORED.md) is
+bundled in this repo; the skill probes for / installs it automatically at
+runtime.
 
-## 用法 / Usage
+## Usage
 
-对 agent 说人话即可，例如：
+Just talk to your agent:
 
-- “帮我讲解 GitHub 收藏，用户名 `octocat`”
-- “我的 stars 里那些仓库都是干嘛的？挑重点讲透”
-- “盘点一下我本机装了哪些技能，各有什么用”
-- “讲讲 `vercel/next.js` 这个项目怎么跑起来的”
+- “Explain my GitHub stars — username `octocat`”
+- “What are all these repos in my stars? Pick the important ones and go deep”
+- “Inventory the skills installed on this machine and explain what each does”
+- “Walk me through how `vercel/next.js` runs”
 
-技能会先给清单和分级方案让你确认，然后分批产出，产物落在新目录里。
+The skill first presents the inventory and a tiering plan for you to confirm,
+then produces in batches; everything lands in a new output directory. All
+documents are written in the language you speak.
 
-## 目录结构 / Layout
+## Layout
 
-```
+```text
 explain-hub/
-├── SKILL.md                     # 主流程（双语，渐进披露入口）
+├── SKILL.md                     # the main flow (progressive-disclosure entry)
 ├── references/
-│   ├── playbook.md              # 实战规则：降级链/门面仓库/漂移核查/限流重试/批量节奏
-│   └── diagram-spec.md          # 三图规范：内容要点/SVG 铁律/渲染链/验收标准
+│   ├── playbook.md              # field rules: fallback chains / facade repos /
+│   │                            #   drift checks / rate-limit re-dispatch / cadence
+│   └── diagram-spec.md          # the three diagrams: briefs / SVG rules /
+│                                #   render chain / acceptance rubric
 ├── assets/templates/
-│   ├── readme-template.md       # 三角度深度 README 模板
-│   └── *-template.html          # 三张图的页面骨架（皮肤/图例/无障碍已就位）
-└── third-party/diagram-design/  # 图表引擎完整副本（MIT，见 VENDORED.md）
+│   ├── readme-template.md       # three-angle deep-dive README template
+│   └── *-template.html          # page chrome for the three diagrams
+│                                #   (skin / legend / a11y ready)
+└── third-party/diagram-design/  # the diagram engine, vendored (MIT)
 ```
 
-## 已验证 / Proven on
+## Proven on
 
-一次真实运行：多仓库、多图表全部通过独立视觉验收；
-本机技能全量讲解。本仓库的 `references/` 就是那次运行踩坑经验的沉淀。
+One real run: many repos and diagrams — all passed independent
+visual acceptance. This repo's
+`references/` are the lessons that run left behind.
 
-## 许可 / License
+## Contributing
 
-MIT。`third-party/diagram-design/` 为独立 MIT 项目的副本，归属见
-[VENDORED.md](third-party/diagram-design/VENDORED.md)。
+See [CONTRIBUTING.md](CONTRIBUTING.md). Changes to the rules are welcome —
+bring the field evidence. | 参与贡献请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
+## License
+
+MIT — see [LICENSE](LICENSE). Bundled third-party software:
+[diagram-design](third-party/diagram-design/) by Cathryn Lavery, MIT, vendored
+unmodified (see its [VENDORED.md](third-party/diagram-design/VENDORED.md) and
+[license](third-party/diagram-design/LICENSE)).

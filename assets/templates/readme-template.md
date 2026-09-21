@@ -1,59 +1,64 @@
-# <项目名> — <一句话中文定位>（A 级全量讲解）
+# <project> — <one-line positioning> (A-tier deep dive)
 
-> 仓库：[<owner>/<repo>](https://github.com/<owner>/<repo>)（<星数>★）｜ 版本 <x.y.z> ｜ 许可 <license>
-> 本机副本：<路径>（无副本则写"分析自 commit <sha> 的浅克隆"）
-> 配图：[功能全景图](功能全景图.html) · [模块架构图](模块架构图.html) · [运行流程图](运行流程图.html)
+> Repo: [<owner>/<repo>](https://github.com/<owner>/<repo>) (<stars>★) | Version <x.y.z> | License <license>
+> Local copy: <path> (or "analyzed from a shallow clone of commit <sha>")
+> Diagrams: [panorama](panorama.html) · [module architecture](architecture.html) · [runtime flow](flow.html)
 
-一句话：<用一句话把这个项目讲给外行听——它是什么、给谁用、解决什么。>
+In one sentence: <explain this project to a layperson — what it is, who it is for, what problem it solves.>
 
 ---
 
-## 角度一 · 它能做什么（功能全景）
+## Angle 1 · What it can do (panorama)
 
-按能力域分组（与功能全景图一致）：
+Grouped by capability domain (mirrors the panorama diagram):
 
-**<域 1 名>**
-- <功能点>（`<file>:<line>`）
-- <功能点>（`<file>:<line>`）
+**<domain 1>**
 
-**<域 2 名>**
+- <feature> (`<file>:<line>`)
+- <feature> (`<file>:<line>`)
+
+**<domain 2>**
+
 - …
 
-## 角度二 · 代码怎么分工（模块架构）
+## Angle 2 · How the code divides work (module architecture)
 
-（与模块架构图一致；表格：层 / 关键文件 / 职责）
+Mirrors the architecture diagram; table: layer / key files / responsibility.
 
-| 层 | 文件/目录 | 职责 |
-|---|---|---|
-| <层名> | `<path>` | <职责，含入口与关键函数名> |
+| Layer   | File/dir | Responsibility                                              |
+| ------- | -------- | ----------------------------------------------------------- |
+| <layer> | `<path>` | <responsibility, incl. entry points and key function names> |
 
-**通信机制**：<渲染层↔服务端/进程间怎么通信、走什么通道>。
+**Transport**: <how the layers/processes talk and over what channel>.
 
-## 角度三 · 核心功能怎么跑：<选一条最有代表性的链路>
+## Angle 3 · How a core feature runs: <pick the most representative path>
 
-（与运行流程图一致；编号步骤，每步带 `file:line`）
+Mirrors the flow diagram; numbered steps, each with `file:line`.
 
-1. **<起点>**：<发生了什么>（`<file>:<line>`）
+1. **<start>**: <what happens> (`<file>:<line>`)
 2. …
 
-## 用户如何使用
+## How to use it
 
-| 方式 | 操作 | 说明 |
-|---|---|---|
-| 普通用户 | <安装/下载方式> | <平台要求/已知坑> |
-| 开发者 | `<命令>` | <前置条件> |
+| Audience   | Action             | Notes                                    |
+| ---------- | ------------------ | ---------------------------------------- |
+| End users  | <install/download> | <platform requirements / known pitfalls> |
+| Developers | `<command>`        | <prerequisites>                          |
 
-**<关键配置/账号要求表>**（如适用：<不登录会怎样/各档位差异>）
+**<Key config/account requirements>** (if applicable: <what happens without login / tier differences>)
 
-## 注意事项
+## Caveats
 
-- <许可证与合规、接口时效、已知缺陷、文档与代码漂移——每条都要有出处>
-- <同赛道一句话对比（如适用）：本仓库走 X 路线，关联讲解见 <>>
+- <License & compliance, API freshness, known defects, doc-vs-code drift — every item sourced>
+- <One-sentence comparison within the same track (if applicable): this repo takes the X approach; see <> for the related explainer>
 
 <!--
-写作纪律：
-1. 每条事实带 file:line 或来源注记；查不到的写"未核实"，不编造。
-2. 宣传语转述为事实描述（"支持 X"而非"强大的 X"）。
-3. README 宣称的能力先在代码里确认，发现漂移单独写进注意事项。
-4. 全文中文；代码标识符/路径/命令保持原文。
+Writing discipline:
+1. Every fact carries a file:line anchor or a source note; write "unverified"
+   when you could not check it — never fabricate.
+2. Restate marketing claims as facts ("supports X", not "powerful X").
+3. Confirm README-claimed capabilities in the code first; record drift
+   under Caveats.
+4. Write the document in the user's language; keep code identifiers,
+   paths and commands in their original form.
 -->

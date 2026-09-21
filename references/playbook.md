@@ -1,80 +1,147 @@
-# Playbook — 实战规则与踩坑清单 / Field-tested rules
+# Playbook — field-tested rules
 
-本文件是 explain-hub 的经验库：每条规则都来自真实批量讲解中踩过的坑。
-按需查阅；画图相关的内容在 [diagram-spec.md](diagram-spec.md)。
+This file is explain-hub's experience library: every rule here comes from a
+pit hit during real batch-explainer runs. Consult as needed; anything about
+drawing diagrams lives in [diagram-spec.md](diagram-spec.md).
 
-## 1. 数据获取降级链 / Getting the stars list
+## 1. Getting the stars list — fallback chain
 
-1. `gh` CLI 常常不存在——不要假设它可用。
-2. 首选公开 API：`https://api.github.com/users/<name>/starred?per_page=100&page=N`（未认证限额 60 次/小时，够拉列表；翻页直到空数组）。先 `GET /users/<name>` 校验账号存在。
-3. Windows 注意：用 python 解析 JSON 时临时文件要放在工作区相对路径，`/tmp` 对 Windows 原生 python 不可见。
-4. API 不可达 → 请用户手动导出（GitHub → Your stars 页面复制），不要卡死。
-5. 拉完把临时 JSON 删掉，别留在工作区。
+1. The `gh` CLI is often absent — do not assume it is available.
+2. Prefer the public API:
+   `https://api.github.com/users/<name>/starred?per_page=100&page=N`
+   (unauthenticated quota is 60/hour, enough to pull the list; paginate until
+   you get an empty array). Verify the account exists with `GET /users/<name>`
+   first.
+3. Windows note: when parsing JSON with python, keep temp files on
+   workspace-relative paths — `/tmp` is invisible to native Windows python.
+4. API unreachable → ask the user to export manually (GitHub → Your stars
+   page, copy-paste). Do not hang.
+5. Delete the temp JSON once parsed; do not leave it in the workspace.
 
-## 2. 子代理编排与限流 / Sub-agents & rate limits
+## 2. Sub-agent orchestration & rate limits
 
-- 大仓库分析派子代理（保住主上下文），prompt 必须自带完整模板路径、输出目录、`file:line` 锚点要求和"不确定就明说"的指令，并要求**最终回复保持简短**。
-- 并行子代理会撞模型限流（表现为 `[1302]` 速率错误、任务静默失败）。**其他代理跑完后重派失败的即可**，不是致命错误。
-- 给子代理的克隆指令：`--depth 1`，失败重试 2 次，仍失败降级为 GitHub API（`api.github.com` + `raw.githubusercontent.com`）分析并在 README 注明。
-- 克隆目录在**视觉验收全部通过之前不要删**——修复图表时还要对照代码。
+- Dispatch sub-agents for large repos (protects the main context). The prompt
+  must carry the full template path, output dir, the `file:line` anchor
+  requirement, the instruction "say when you are unsure", and a demand that
+  the **final reply stays short**.
+- Parallel sub-agents will hit model rate limits (symptoms: `[1302]` rate
+  errors, silently dead tasks). **Re-dispatch the failures after the others
+  finish** — it is not fatal.
+- Clone instructions for sub-agents: `--depth 1`, retry twice, then fall back
+  to GitHub API analysis (`api.github.com` + `raw.githubusercontent.com`)
+  and note it in the README.
+- Do **not** delete the clone dir before visual QA fully passes — chart fixes
+  need to be checked against the code.
 
-## 3. 门面仓库识别 / Facade repos
+## 3. Facade repos
 
-星数不等于内容。动手分析前先花一分钟验证：
+Stars do not equal content. Spend one minute verifying before you analyze:
 
-- `main` 分支是否只有个位数提交、几十个文件？（某 90k★ 仓库 main 实为从零重写的空脚手架，真实代码在被归档的 sibling 仓库）
-- README 宣传的功能在目录里有没有对应实现目录？
-- 发现门面时：找到真实代码库（archived 分支 / `-classic` 后缀兄弟仓库 / 官方链接），**讲真实代码**，并在 README 和索引里写明"主仓库为脚手架，讲解基于 X"。
+- Does `main` have only single-digit commits and a few dozen files? (One 90k★
+  repo's `main` turned out to be an empty scaffold rewritten from scratch;
+  the real code lived in an archived sibling repo.)
+- Does the README advertise features that have no matching implementation
+  directory?
+- When you find a facade: locate the real codebase (archived branch /
+  `-classic` sibling repo / official link), **explain the real code**, and
+  state in the README and the index that "the main repo is a scaffold; this
+  explainer is based on X".
 
-## 4. 文档与代码漂移核查 / Doc-vs-code drift
+## 4. Doc-vs-code drift checks
 
-README 和 SKILL.md 会撒谎（过时、宣传口径）。对要写进讲解的关键声明：
+READMEs and SKILL.md files lie (stale, marketing tone). For every key claim
+going into an explainer:
 
-- 声称的 CLI 子命令 → `grep argparse` / 入口文件确认真的存在。
-- 声称的数量（模板数/预设数/支持工具数）→ 按目录或枚举实测，两个口径都写。
-- 声称的版本/星数 → 能用 API 核实就核实（`api.github.com/repos/<o>/<r>` 返回 `stargazers_count`），不能就写"沿用任务给定值，未独立核实"。
-- 漂移本身就是讲解素材：单独写进"注意事项"。
+- Claimed CLI subcommands → confirm they exist via `grep argparse` / the
+  entry file.
+- Claimed counts (templates/presets/supported tools) → actually enumerate the
+  directory; write both numbers when they differ.
+- Claimed versions/star counts → verify via API when you can
+  (`api.github.com/repos/<o>/<r>` returns `stargazers_count`); otherwise
+  write "as given, not independently verified".
+- Drift is itself explainer material: call it out under Caveats.
 
-## 5. A/B 分级启发式 / Tiering heuristics
+## 5. Tiering heuristics
 
-给 A 级（全量三图）的信号，满足越多越优先：
+Signals for A-tier (full three diagrams) — the more matched, the higher the
+priority:
 
-- 是本机已装技能/插件的上游仓库（两边讲解互相引用，价值翻倍）；
-- 星数高（工具生态位明确）；
-- 本地已有副本（省一次克隆）；
-- 用户实际会用的核心工具（代理客户端、编辑器、生产力工作台）。
+- It is the upstream repo of a locally installed skill/plugin (cross-linking
+  the two explainers doubles the value);
+- High star count (a clear tooling niche);
+- A local copy already exists (saves a clone);
+- A core tool the user actually uses (agent clients, editors, productivity
+  workbenches).
 
-B 级（一页纸）兜底其余全部。分级是**临时**的：批量清单里标好 A/B，用户随时可升级单个 B。上限默认 25 个 A，超了就让用户砍或提高上限。
+B-tier (one-pager) covers everything else. Tiering is **provisional**: mark
+A/B in the batch list; the user can promote any B at any time. Default cap is
+25 A-tier items; beyond that, have the user cut or raise the cap.
 
-## 6. 批量确认节奏 / Batch cadence
+## 6. Batch cadence
 
-- 先给全量清单让用户对**范围和深度**拍板（一次问清，不逐项骚扰）。
-- 执行期每批 5–8 项：出清单（✅建议/⬜可选 + 推荐理由）→ 用户勾选 → 连续做完 → 下一批。
-- 两个任务线（技能/stars）可混勾；用户说"全做/按推荐来"就整批执行，不再打断。
+- First present the full inventory so the user decides **scope and depth**
+  once (one question, not per-item nagging).
+- During execution, batches of 5–8 items: present the checklist
+  (✅ recommended / ⬜ optional + why) → user picks → run them all → next
+  batch.
+- The two tracks (skills / stars) can be mixed in one pick; if the user says
+  "do all / go with your recommendations", execute the whole batch without
+  further interruptions.
 
-## 7. 索引与交叉引用 / Index & cross-references
+## 7. Index & cross-references
 
-- 每个输出目录一份 `README.md` 总索引：篇目表 + 状态列（⬜待做/🖊️写作中/✅完成/❌失效），完成一篇改一篇。
-- skill 同源仓库 ↔ 本机技能讲解**双向链接**；同一赛道项目在"注意事项"里一句话对比（如"X 走本地 SDK，Y 走 HTTP 服务化"）。
-- 失效技能记录成表（名称/症状：空目录或断链/修复指引），这是用户最意外的收获之一。
+- One `README.md` master index per output directory: the entry table + a
+  status column (⬜ todo / 🖊️ in progress / ✅ done / ❌ broken); flip each
+  row as it completes.
+- A skill's upstream repo ↔ the installed-skill explainer get **bidirectional
+  links**; same-track projects get a one-sentence comparison under Caveats
+  (e.g. "X is a local SDK, Y is an HTTP service").
+- Record broken skills as a table (name / symptom: empty dir or dead link /
+  repair instructions) — one of the most unexpectedly useful outputs.
 
-## 8. 模式 B 专项 / Installed-skills mode specifics
+## 8. Installed-skills mode specifics
 
-- 技能目录是**软链接农场**：`~/.zcode/skills` 与 `~/.agents/skills` 大量互指，真实副本在 `~/.skills-manager/skills`、`~/.codex/skills`（含 `.system` 内置）和插件缓存。用 `readlink` 逐个解析，按真实路径去重。
-- `ls -F` 带 `@` 是软链；`*/` 通配会**跳过断链**——用 `readlink -e` 判断目标是否存在。
-- 目标目录存在但为空 = 安装损坏（空目录）；readlink 为空且目标不存在 = 断链。两类都记入失效表。
-- 有的 SKILL.md 不在加载列表里（frontmatter 缺失/禁用），照样值得讲——以磁盘内容为准。
-- 成系列的去重合并（同前缀），一篇总览讲清成员分工与配合链。
+- Skill directories are **symlink farms**: `~/.zcode/skills` and
+  `~/.agents/skills` point at each other heavily; the real copies live in
+  `~/.skills-manager/skills`, `~/.codex/skills` (including `.system`
+  built-ins) and plugin caches. Resolve each link with `readlink` and
+  deduplicate by real path.
+- In `ls -F` output, `@` marks a symlink; the `*/` glob **skips dead links** —
+  use `readlink -e` to test whether the target exists.
+- Target directory exists but is empty = broken install (empty dir);
+  `readlink` returns nothing and the target does not exist = dead link. Both
+  go into the broken table.
+- Some SKILL.md files are not on the loaded list (missing/disabled
+  frontmatter) but are still worth explaining — treat disk contents as the
+  source of truth.
+- Merge families (same prefix) into one overview covering member division of
+  labor and how they cooperate.
 
-## 9. 渲染与视觉验收 / Rendering & visual QA
+## 9. Rendering & visual QA
 
-- 截图链与常见坑（Chromium 下载失败、中文路径）见 [diagram-spec.md](diagram-spec.md) §渲染。
-- 验收代理 prompt 要素：逐页 JSON 裁决（pass/fail + 带位置的问题列表）、设计体系清单（正交连线/蒙版标签/≤2 珊瑚/图例置底）、"minor: 前缀=不阻塞"、"fail 只判用户肉眼可见的破损"。
-- **只复检改过的页**，把修复内容写进复检 prompt 让代理有的放矢。
-- 常见 fail 模式速查：箭头标签压线（蒙版与线 6-10px 隙）、虚线跨实线无半圆桥、悬空箭头（终点没落在盒子边上）、两条线共用同一 attach 点、导出格式标签装反、流程图末节点脱节。
+- The screenshot chain and its common pitfalls (Chromium download failures,
+  non-ASCII paths) are in [diagram-spec.md](diagram-spec.md) § Rendering.
+- Review-agent prompt essentials: a per-page JSON verdict (pass/fail + a
+  positioned issue list), the design-system checklist (orthogonal connectors
+  / masked labels / ≤2 coral accents / legend at the bottom), "prefix `minor:`
+  = non-blocking", "fail only on user-visible breakage".
+- **Re-check only the pages you changed**, and list each fix in the re-check
+  prompt so the agent knows where to look.
+- Quick reference of common fails: arrow labels sitting on the line (mask
+  needs a 6–10px visible gap), dashed line crossing a solid one without a
+  half-circle bridge, dangling arrows (endpoints must land on a box edge),
+  two lines sharing one attach point, export-format labels swapped, a
+  flowchart's end node disconnected.
 
-## 10. B 级一页纸模板 / Lightweight one-pager
+## 10. Lightweight one-pager template
 
-- 资料来源：`raw.githubusercontent.com/<o>/<r>/main/README.md`（main 不行试 master/dev，或 `api.github.com/repos/<o>/<r>/readme` + `Accept: application/vnd.github.raw`）；全失败就用仓库元数据（description/topics/language）写并注明。
-- 结构：`# 仓库名 — 一句话定位`；`## 它能做什么`（3-6 条，宣传语转述为事实）；`## 怎么上手`；`## 与你的关联`（与其他讲解的串引，没有硬扯就写适用场景）；`## 链接`。
-- 25-45 行；文件名 `<owner>__<repo>.md`；语气克制，未提及的不写。
+- Source: `raw.githubusercontent.com/<o>/<r>/main/README.md` (if `main`
+  fails, try `master`/`dev`, or `api.github.com/repos/<o>/<r>/readme` with
+  `Accept: application/vnd.github.raw`); if everything fails, write from repo
+  metadata (description/topics/language) and say so.
+- Structure: `# repo — one-line positioning`; `## What it can do` (3–6
+  bullets, marketing speak restated as facts); `## How to get started`;
+  `## Why it matters to you` (cross-references to other explainers, or the
+  use case if none); `## Links`.
+- 25–45 lines; filename `<owner>__<repo>.md`; restrained tone; do not
+  mention what the source never did.
