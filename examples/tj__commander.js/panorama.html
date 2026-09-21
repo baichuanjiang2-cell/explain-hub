@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<!-- Feature panorama for tj/commander.js. Zones: DEFINE / PARSE / ASSIST.
+     Drawn per explain-hub/references/diagram-spec.md; rules authority:
+     diagram-design SKILL.md §6/§7. Analysis baseline: commit ba6d13dd. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>commander.js · Feature Panorama</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#f5f5f5;font-family:'Geist','Noto Sans SC',sans-serif;color:#2d3142;}
+  main{max-width:1220px;margin:0 auto;padding:40px 28px 48px;}
+  .eyebrow{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#7a8399;margin:0 0 10px;}
+  h1{font-family:'Instrument Serif','Noto Sans SC',serif;font-weight:400;font-size:30px;margin:0 0 6px;}
+  .subtitle{font-size:14px;color:#4f5d75;margin:0 0 28px;}
+  figure{margin:0;}
+  figcaption{font-family:'Geist Mono',monospace;font-size:10px;color:#7a8399;margin-top:14px;}
+  footer{margin-top:36px;padding-top:12px;border-top:1px solid rgba(45,49,66,.10);font-family:'Geist Mono',monospace;font-size:10px;color:#7a8399;letter-spacing:.06em;}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <p class="eyebrow">commander.js · Feature Panorama</p>
+  <h1>Feature panorama</h1>
+  <p class="subtitle">Three capability domains · nine modules — what commander.js does for a CLI author</p>
+</header>
+<figure>
+<svg viewBox="0 0 1180 690" role="img" aria-labelledby="cp-title cp-desc">
+<title id="cp-title">commander.js feature panorama</title>
+<desc id="cp-desc">Nine capability modules in three domains: DEFINE declares the program (command tree, option model, argument model); PARSE turns argv into values (entry points, the argv splitter, the value pipeline); ASSIST fails helpfully (help rendering, did-you-mean suggestions, typed errors and hooks).</desc>
+<defs>
+<marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+<marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+</defs>
+<rect width="100%" height="100%" fill="#f5f5f5"/>
+
+<!-- zones -->
+<rect x="40" y="130" width="320" height="476" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+<rect x="125" y="134" width="150" height="12" rx="2" fill="#f5f5f5"/>
+<text x="200" y="143" fill="rgba(45,49,66,0.40)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.14em">DEFINE</text>
+<rect x="420" y="130" width="320" height="476" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+<rect x="505" y="134" width="150" height="12" rx="2" fill="#f5f5f5"/>
+<text x="580" y="143" fill="rgba(45,49,66,0.40)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.14em">PARSE</text>
+<rect x="800" y="130" width="340" height="476" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+<rect x="895" y="134" width="150" height="12" rx="2" fill="#f5f5f5"/>
+<text x="970" y="143" fill="rgba(45,49,66,0.40)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.14em">ASSIST</text>
+
+<!-- arrows (drawn before nodes) -->
+<line x1="332" y1="234" x2="448" y2="234" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="358" y="214" width="66" height="12" rx="2" fill="#f5f5f5"/>
+<text x="391" y="223" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.06em">REGISTER</text>
+
+<line x1="332" y1="380" x2="448" y2="380" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="362" y="360" width="56" height="12" rx="2" fill="#f5f5f5"/>
+<text x="390" y="369" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.06em">MATCH</text>
+
+<line x1="580" y1="294" x2="580" y2="320" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line x1="580" y1="440" x2="580" y2="466" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+<line x1="712" y1="234" x2="828" y2="234" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+<rect x="738" y="214" width="50" height="12" rx="2" fill="#f5f5f5"/>
+<text x="763" y="223" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.06em">HELP</text>
+
+<line x1="712" y1="380" x2="828" y2="380" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+<rect x="730" y="360" width="66" height="12" rx="2" fill="#f5f5f5"/>
+<text x="763" y="369" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.06em">SUGGEST</text>
+
+<line x1="712" y1="526" x2="828" y2="526" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+<rect x="736" y="506" width="56" height="12" rx="2" fill="#f5f5f5"/>
+<text x="764" y="515" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.06em">HOOKS</text>
+
+<!-- DEFINE nodes -->
+<rect x="68" y="174" width="264" height="120" rx="6" fill="#f5f5f5"/>
+<rect x="68" y="174" width="264" height="120" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="76" y="180" width="34" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="93" y="189" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">CORE</text>
+<text x="200" y="222" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">Fluent command tree</text>
+<text x="200" y="246" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">.command() · .addCommand()</text>
+<text x="200" y="262" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">lib/command.js:156</text>
+
+<rect x="68" y="320" width="264" height="120" rx="6" fill="#f5f5f5"/>
+<rect x="68" y="320" width="264" height="120" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="76" y="326" width="44" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="98" y="335" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">MODEL</text>
+<text x="200" y="368" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">Option model</text>
+<text x="200" y="392" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">default · preset · env · choices</text>
+<text x="200" y="408" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">lib/option.js:47</text>
+
+<rect x="68" y="466" width="264" height="120" rx="6" fill="#f5f5f5"/>
+<rect x="68" y="466" width="264" height="120" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="76" y="472" width="44" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="98" y="481" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">MODEL</text>
+<text x="200" y="514" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">Argument model</text>
+<text x="200" y="538" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">variadic &lt;files...&gt; · parsers</text>
+<text x="200" y="554" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">lib/argument.js:33</text>
+
+<!-- PARSE nodes -->
+<rect x="448" y="174" width="264" height="120" rx="6" fill="#f5f5f5"/>
+<rect x="448" y="174" width="264" height="120" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="456" y="180" width="40" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="476" y="189" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">ENTRY</text>
+<text x="580" y="222" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">parse() / parseAsync()</text>
+<text x="580" y="246" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">from: node · electron · user</text>
+<text x="580" y="262" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">lib/command.js:1081</text>
+
+<rect x="448" y="320" width="264" height="120" rx="6" fill="#f5f5f5"/>
+<rect x="448" y="320" width="264" height="120" rx="6" fill="rgba(235,108,54,0.10)" stroke="#eb6c36" stroke-width="1"/>
+<rect x="456" y="326" width="34" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="473" y="335" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">CORE</text>
+<text x="580" y="368" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">argv splitter</text>
+<text x="580" y="392" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">-- · -abc groups · values</text>
+<text x="580" y="408" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">lib/command.js:1760</text>
+
+<rect x="448" y="466" width="264" height="120" rx="6" fill="#f5f5f5"/>
+<rect x="448" y="466" width="264" height="120" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="456" y="472" width="34" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="473" y="481" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">CORE</text>
+<text x="580" y="514" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">value pipeline</text>
+<text x="580" y="538" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">CLI → env → implied</text>
+<text x="580" y="554" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">lib/command.js:1564</text>
+
+<!-- ASSIST nodes -->
+<rect x="828" y="174" width="264" height="120" rx="6" fill="#f5f5f5"/>
+<rect x="828" y="174" width="264" height="120" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="836" y="180" width="54" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="863" y="189" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">SUPPORT</text>
+<text x="960" y="222" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">help rendering</text>
+<text x="960" y="246" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">column alignment · wrapping</text>
+<text x="960" y="262" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">lib/help.js:13</text>
+
+<rect x="828" y="320" width="264" height="120" rx="6" fill="#f5f5f5"/>
+<rect x="828" y="320" width="264" height="120" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="836" y="326" width="54" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="863" y="335" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">SUPPORT</text>
+<text x="960" y="368" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">did-you-mean</text>
+<text x="960" y="392" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">edit-distance suggestions</text>
+<text x="960" y="408" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">lib/command.js:2126</text>
+
+<rect x="828" y="466" width="264" height="120" rx="6" fill="#f5f5f5"/>
+<rect x="828" y="466" width="264" height="120" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="836" y="472" width="54" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="863" y="481" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">SUPPORT</text>
+<text x="960" y="514" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">typed errors + hooks</text>
+<text x="960" y="538" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">preAction / postAction</text>
+<text x="960" y="554" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">lib/error.js:4</text>
+
+<!-- legend -->
+<line x1="30" y1="634" x2="1150" y2="634" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+<text x="30" y="658" fill="#4f5d75" font-size="8" font-family="'Geist Mono',monospace" letter-spacing="0.14em">LEGEND</text>
+<rect x="110" y="650" width="14" height="10" rx="2" fill="rgba(235,108,54,0.10)" stroke="#eb6c36" stroke-width="1"/>
+<text x="132" y="658" fill="#4f5d75" font-size="9" font-family="'Geist',sans-serif">flagship capability</text>
+<rect x="270" y="650" width="14" height="10" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<text x="292" y="658" fill="#4f5d75" font-size="9" font-family="'Geist',sans-serif">capability module</text>
+<line x1="430" y1="655" x2="458" y2="655" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="466" y="658" fill="#4f5d75" font-size="9" font-family="'Geist',sans-serif">defines / feeds</text>
+<line x1="580" y1="655" x2="608" y2="655" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+<text x="616" y="658" fill="#4f5d75" font-size="9" font-family="'Geist',sans-serif">assistance trigger</text>
+</svg>
+<figcaption>Annotated from source: tj/commander.js v15.0.0 · commit ba6d13dd (master, 2026-05-29)</figcaption>
+</figure>
+<footer>COMMANDER.JS FEATURE PANORAMA · GENERATED WITH DIAGRAM-DESIGN · 2026-09-21</footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<!-- Module architecture for tj/commander.js. Zones partition by layer:
+     public surface / engine core / support. Arrow labels carry the transport.
+     Drawn per explain-hub/references/diagram-spec.md. Baseline: ba6d13dd. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>commander.js · Module Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#f5f5f5;font-family:'Geist','Noto Sans SC',sans-serif;color:#2d3142;}
+  main{max-width:1220px;margin:0 auto;padding:40px 28px 48px;}
+  .eyebrow{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#7a8399;margin:0 0 10px;}
+  h1{font-family:'Instrument Serif','Noto Sans SC',serif;font-weight:400;font-size:30px;margin:0 0 6px;}
+  .subtitle{font-size:14px;color:#4f5d75;margin:0 0 28px;}
+  figure{margin:0;}
+  figcaption{font-family:'Geist Mono',monospace;font-size:10px;color:#7a8399;margin-top:14px;}
+  footer{margin-top:36px;padding-top:12px;border-top:1px solid rgba(45,49,66,.10);font-family:'Geist Mono',monospace;font-size:10px;color:#7a8399;letter-spacing:.06em;}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <p class="eyebrow">commander.js · Module Architecture</p>
+  <h1>Module architecture</h1>
+  <p class="subtitle">One package, one process, zero dependencies — six lib modules behind one ESM entry</p>
+</header>
+<figure>
+<svg viewBox="0 0 1180 690" role="img" aria-labelledby="ca-title ca-desc">
+<title id="ca-title">commander.js module architecture</title>
+<desc id="ca-desc">The public surface is index.js (a program singleton and factory functions). The engine core is lib/command.js, the Command class built on EventEmitter, which aggregates the option and argument models. Support modules are help formatting, typed errors, and edit-distance suggestions, delegated to, thrown from, or consulted by the core.</desc>
+<defs>
+<marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+<marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+</defs>
+<rect width="100%" height="100%" fill="#f5f5f5"/>
+
+<!-- zones -->
+<rect x="40" y="130" width="320" height="192" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+<rect x="102" y="134" width="196" height="12" rx="2" fill="#f5f5f5"/>
+<text x="200" y="143" fill="rgba(45,49,66,0.40)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.14em">PUBLIC SURFACE</text>
+<rect x="420" y="130" width="320" height="476" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+<rect x="505" y="134" width="150" height="12" rx="2" fill="#f5f5f5"/>
+<text x="580" y="143" fill="rgba(45,49,66,0.40)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.14em">ENGINE CORE</text>
+<rect x="800" y="130" width="340" height="476" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+<rect x="895" y="134" width="150" height="12" rx="2" fill="#f5f5f5"/>
+<text x="970" y="143" fill="rgba(45,49,66,0.40)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.14em">SUPPORT</text>
+
+<!-- arrows -->
+<line x1="332" y1="234" x2="448" y2="234" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="354" y="214" width="62" height="12" rx="2" fill="#f5f5f5"/>
+<text x="385" y="223" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.06em">IMPORTS</text>
+
+<line x1="580" y1="294" x2="580" y2="320" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+<path d="M 448,262 H 408 V 526 H 448" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+<line x1="712" y1="234" x2="828" y2="234" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="734" y="214" width="74" height="12" rx="2" fill="#f5f5f5"/>
+<text x="771" y="223" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.06em">DELEGATES</text>
+
+<path d="M 712,252 H 788 V 380 H 828" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+<rect x="716" y="258" width="44" height="12" rx="2" fill="#f5f5f5"/>
+<text x="738" y="267" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.06em">THROWS</text>
+
+<path d="M 712,276 H 760 V 526 H 828" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+<rect x="764" y="508" width="52" height="12" rx="2" fill="#f5f5f5"/>
+<text x="790" y="517" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.06em">CONSULTS</text>
+
+<!-- PUBLIC SURFACE node -->
+<rect x="68" y="174" width="264" height="120" rx="6" fill="#f5f5f5"/>
+<rect x="68" y="174" width="264" height="120" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="76" y="180" width="40" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="96" y="189" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">ENTRY</text>
+<text x="200" y="222" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">index.js</text>
+<text x="200" y="246" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">program singleton · factories</text>
+<text x="200" y="262" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">index.js:9</text>
+
+<!-- ENGINE CORE nodes -->
+<rect x="448" y="174" width="264" height="120" rx="6" fill="#f5f5f5"/>
+<rect x="448" y="174" width="264" height="120" rx="6" fill="rgba(235,108,54,0.10)" stroke="#eb6c36" stroke-width="1"/>
+<rect x="456" y="180" width="34" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="473" y="189" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">CORE</text>
+<text x="580" y="222" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">lib/command.js</text>
+<text x="580" y="246" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">Command extends EventEmitter</text>
+<text x="580" y="262" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">lib/command.js:14</text>
+
+<rect x="448" y="320" width="264" height="120" rx="6" fill="#f5f5f5"/>
+<rect x="448" y="320" width="264" height="120" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="456" y="326" width="44" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="478" y="335" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">MODEL</text>
+<text x="580" y="368" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">lib/option.js</text>
+<text x="580" y="392" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">flags · parsers · defaults</text>
+<text x="580" y="408" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">lib/option.js:3</text>
+
+<rect x="448" y="466" width="264" height="120" rx="6" fill="#f5f5f5"/>
+<rect x="448" y="466" width="264" height="120" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="456" y="472" width="44" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="478" y="481" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">MODEL</text>
+<text x="580" y="514" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">lib/argument.js</text>
+<text x="580" y="538" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">positionals · variadic</text>
+<text x="580" y="554" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">lib/argument.js:3</text>
+
+<!-- SUPPORT nodes -->
+<rect x="828" y="174" width="264" height="120" rx="6" fill="#f5f5f5"/>
+<rect x="828" y="174" width="264" height="120" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="836" y="180" width="54" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="863" y="189" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">SUPPORT</text>
+<text x="960" y="222" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">lib/help.js</text>
+<text x="960" y="246" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">layout · alignment · wrap</text>
+<text x="960" y="262" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">lib/help.js:13</text>
+
+<rect x="828" y="320" width="264" height="120" rx="6" fill="#f5f5f5"/>
+<rect x="828" y="320" width="264" height="120" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="836" y="326" width="54" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="863" y="335" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">SUPPORT</text>
+<text x="960" y="368" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">lib/error.js</text>
+<text x="960" y="392" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">CommanderError family</text>
+<text x="960" y="408" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">lib/error.js:4</text>
+
+<rect x="828" y="466" width="264" height="120" rx="6" fill="#f5f5f5"/>
+<rect x="828" y="466" width="264" height="120" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="836" y="472" width="54" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="863" y="481" fill="rgba(45,49,66,0.8)" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">SUPPORT</text>
+<text x="960" y="514" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">lib/suggestSimilar.js</text>
+<text x="960" y="538" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">edit distance</text>
+<text x="960" y="554" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">lib/suggestSimilar.js:56</text>
+
+<!-- legend -->
+<line x1="30" y1="634" x2="1150" y2="634" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+<text x="30" y="658" fill="#4f5d75" font-size="8" font-family="'Geist Mono',monospace" letter-spacing="0.14em">LEGEND</text>
+<rect x="110" y="650" width="14" height="10" rx="2" fill="rgba(235,108,54,0.10)" stroke="#eb6c36" stroke-width="1"/>
+<text x="132" y="658" fill="#4f5d75" font-size="9" font-family="'Geist',sans-serif">integration hub</text>
+<rect x="250" y="650" width="14" height="10" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<text x="272" y="658" fill="#4f5d75" font-size="9" font-family="'Geist',sans-serif">module</text>
+<line x1="350" y1="655" x2="378" y2="655" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="386" y="658" fill="#4f5d75" font-size="9" font-family="'Geist',sans-serif">imports / aggregates</text>
+<line x1="520" y1="655" x2="548" y2="655" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+<text x="556" y="658" fill="#4f5d75" font-size="9" font-family="'Geist',sans-serif">delegates · throws · consults</text>
+</svg>
+<figcaption>Transport contract: single process, zero dependencies, pure ESM — the internal channel is EventEmitter (option:&lt;name&gt; events, lib/command.js:1816)</figcaption>
+</figure>
+<footer>COMMANDER.JS MODULE ARCHITECTURE · GENERATED WITH DIAGRAM-DESIGN · 2026-09-21</footer>
+</main>
+</body>
+</html>
